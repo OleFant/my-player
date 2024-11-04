@@ -1,0 +1,15 @@
+body {
+    height: 100vh;
+    background: url(img/bg.png);
+    background-repeat:no-repeat;
+    background-size: cover ;
+    background-position: center;
+}
+#controls {
+    display: flex;
+    margin-left: 10;
+    margin-top: 10;
+}
+#playerCont {
+    margin-top: 10px;
+}

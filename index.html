@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <title>Moving Player with Chat</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css" />
+  <script type="text/javascript" src="jquery-3.3.1.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <style>
+    #chatContainer {
+      width: 450px; /* Set width for the chat iframe */
+      height: 500px; /* Set height for the chat iframe */
+      border: 1px solid #ccc; /* Optional: Add a border */
+      display: none; /* Initially hidden */
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <select name="" id="selectCont">
+      <option value="" selected disabled>выбирите видео</option>
+      <option value="jfKfPfyJRdk">Lofi for study</option>
+      <option value="4xDzrJKXOOY">Lofi Gaming</option>
+      <option value="28KRPhVzCus">Lofi Chill</option>
+    </select>
+    
+    <input type="text" id="videoUrlInput" placeholder="Enter YouTube Video URL" />
+    <button id="loadVideoButton">Load Video</button>
+    <button id="openChatButton">Open Chat</button>
+  </div>
+
+  <div id="container">
+    <div id="playerCont">
+      <div id="player"></div>
+    </div>
+    <div id="chatContainer">
+      <iframe id="chatIframe" src="" frameborder="0" style="width: 100%; height: 100%;"></iframe>
+    </div>
+  </div>
+  
+  <script>
+    var player;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '640',
+        width: '450',
+        videoId: '', // Start with no video
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          fs: 1,
+          rel: 0,
+          showinfo: 0
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      // Player is ready
+    }
+
+    function onPlayerStateChange(event) {
+      // Handle player state changes if needed
+    }
+
+    document.getElementById('selectCont').addEventListener("change", function() {
+      var videoId = this.value;
+      if (player && videoId) {
+        player.loadVideoById(videoId);
+      }
+    });
+
+    document.getElementById('loadVideoButton').addEventListener("click", function() {
+      var videoUrl = document.getElementById('videoUrlInput').value.trim();
+      var { videoId, startTime } = extractVideoIDAndTime(videoUrl);
+      if (player && videoId) {
+        player.loadVideoById(videoId, startTime);
+      } else {
+        alert('Пожалуйста, введите корректную ссылку на видео YouTube.');
+      }
+    });
+
+    document.getElementById('openChatButton').addEventListener("click", function() {
+      var videoUrl = document.getElementById('videoUrlInput').value.trim();
+      var { videoId } = extractVideoIDAndTime(videoUrl);
+      if (videoId) {
+        var chatUrl = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=YOUR_DOMAIN`; // Replace YOUR_DOMAIN with your actual domain
+        document.getElementById('chatIframe').src = chatUrl; // Set the iframe source
+        document.getElementById('chatContainer').style.display = 'block'; // Show the chat container
+      } else {
+        alert('Пожалуйста, введите корректную ссылку на видео YouTube для открытия чата.');
+      }
+    });
+
+    function extractVideoIDAndTime(url) {
+      var videoId = null;
+      var startTime = 0; // Начальное время по умолчанию
+      var regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[?&]t=(\d+))?/;
+      var matches = url.match(regex);
+      if (matches) {
+        videoId = matches[1]; // Возвращаем идентификатор видео
+        if (matches[2]) {
+          startTime = parseInt(matches[2]); // Если есть метка времени, преобразуем в число
+        }
+      }
+      return { videoId, startTime };
+    }
+  </script>
+</body>
+</html>
